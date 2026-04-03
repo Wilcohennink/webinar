@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gratis Uurtarief Calculator ZZP 2026 — The Profit Factory</title>
+  <meta name="description" content="Bereken je minimumtarief als ZZP'er op basis van gewenst inkomen, kosten en uren. Gratis, direct resultaat." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 32px 16px; }
+    .logo { font-size: .85rem; color: #f4c430; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; margin-bottom: 28px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 32px; max-width: 480px; width: 100%; }
+    h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+    h1 span { color: #f4c430; }
+    .sub { color: #94a3b8; font-size: .9rem; margin-bottom: 28px; }
+    .field { margin-bottom: 18px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+    label { display: block; font-size: .82rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    input[type="number"] { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 1rem; font-weight: 600; outline: none; }
+    input[type="number"]:focus { border-color: #f4c430; }
+    .results { background: #0f172a; border-radius: 10px; padding: 20px; display: none; border: 1px solid #334155; }
+    .results.show { display: block; }
+    .result-main { text-align: center; padding-bottom: 16px; border-bottom: 1px solid #1e293b; margin-bottom: 12px; }
+    .result-main .val { color: #f4c430; font-size: 2.5rem; font-weight: 900; }
+    .result-main .unit { color: #94a3b8; font-size: 1rem; }
+    .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: .9rem; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .lbl { color: #94a3b8; }
+    .result-row .v { font-weight: 700; }
+    .cta { margin-top: 24px; text-align: center; padding-top: 24px; border-top: 1px solid #334155; }
+    .cta a { display: inline-block; background: #f4c430; color: #0f172a; font-weight: 800; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin: 4px; }
+    .cta a.sec { background: transparent; border: 1px solid #334155; color: #f8fafc; }
+  </style>
+</head>
+<body>
+  <div class="logo">The Profit Factory</div>
+  <div class="card">
+    <h1>Gratis <span>Uurtarief</span> Calculator</h1>
+    <p class="sub">Bereken je minimumtarief als ZZP'er. Direct resultaat.</p>
+    <div class="field">
+      <label>Gewenst netto-inkomen per jaar (€)</label>
+      <input type="number" id="netto" value="60000" min="0" oninput="calc()" />
+    </div>
+    <div class="field-row">
+      <div>
+        <label>Uren per week</label>
+        <input type="number" id="uren" value="40" min="1" max="60" oninput="calc()" />
+      </div>
+      <div>
+        <label>Vakantieweken</label>
+        <input type="number" id="vakantie" value="4" min="0" max="10" oninput="calc()" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Jaarlijkse zakelijke kosten (€)</label>
+      <input type="number" id="kosten" value="5000" min="0" oninput="calc()" />
+    </div>
+    <div class="results show" id="results">
+      <div class="result-main">
+        <p style="color:#94a3b8;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Minimumtarief</p>
+        <div><span class="val" id="r-tarief">—</span><span class="unit">/uur excl. BTW</span></div>
+        <div style="color:#94a3b8;font-size:.85rem;margin-top:4px;" id="r-incl">— incl. 21% BTW</div>
+      </div>
+      <div class="result-row"><span class="lbl">Benodigde maandomzet</span><span class="v" id="r-mnd">—</span></div>
+      <div class="result-row"><span class="lbl">Factureerbare uren/jaar</span><span class="v" id="r-uren">—</span></div>
+      <div class="result-row"><span class="lbl">Bruto benodigd/jaar</span><span class="v" id="r-bruto">—</span></div>
+    </div>
+    <div class="cta">
+      <a href="/btw-calculator/">BTW Calculator →</a>
+      <a href="https://moneymachine.vercel.app/invoice-generator" class="sec">Gratis Factuurmaker →</a>
+    </div>
+  </div>
+  <script>
+    function fmt(n) { return '€ ' + Math.round(n).toLocaleString('nl-NL'); }
+    function fmtH(n) { return '€ ' + n.toFixed(0); }
+    function calc() {
+      const netto = parseFloat(document.getElementById('netto').value) || 0;
+      const uren = parseFloat(document.getElementById('uren').value) || 40;
+      const vakantie = parseFloat(document.getElementById('vakantie').value) || 4;
+      const kosten = parseFloat(document.getElementById('kosten').value) || 0;
+      const werkweken = 52 - vakantie;
+      const factureerbaar = Math.round(werkweken * uren * 0.65);
+      const bruto = netto / 0.63 + kosten;
+      const tarief = factureerbaar > 0 ? bruto / factureerbaar : 0;
+      const tariefIncl = tarief * 1.21;
+      document.getElementById('r-tarief').textContent = fmtH(tarief);
+      document.getElementById('r-incl').textContent = fmtH(tariefIncl) + '/uur incl. 21% BTW';
+      document.getElementById('r-mnd').textContent = fmt(bruto / 12);
+      document.getElementById('r-uren').textContent = factureerbaar + ' uur';
+      document.getElementById('r-bruto').textContent = fmt(bruto);
+    }
+    calc();
+  </script>
+</body>
+</html>
