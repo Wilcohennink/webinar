@@ -309,7 +309,7 @@
         <div id="form-container">
           <h2>Reserveer je gratis plek</h2>
           <p class="sub">Beperkt aantal plaatsen beschikbaar — meld je nu aan.</p>
-          <form id="webinar-form" action="https://formspree.io/f/xyzpqrst" method="POST">
+          <form id="webinar-form" action="mailto:info@theprofitfactory.ai" method="POST" enctype="text/plain">
             <input type="hidden" name="_subject" value="Webinar aanmelding: Hoe Bureaus €10K+ Verdienen met White-Label AI" />
             <div class="form-group">
               <label for="name">Naam</label>
@@ -326,8 +326,8 @@
         <div class="thankyou" id="thankyou">
           <div class="checkmark">✅</div>
           <h3>Je bent aangemeld!</h3>
-          <p>Bedankt! Je ontvangt de Zoom-link <strong>1 uur voor aanvang</strong> (15 april om 14:00 CET) op je e-mailadres.</p>
-          <p style="margin-top:10px; color: var(--muted);">Tot zaterdag 4 april om 15:00 CET!</p>
+          <p>Bedankt! Je ontvangt de Zoom-link <strong>1 uur voor aanvang</strong> (4 april om 14:00 CET) op je e-mailadres.</p>
+          <p style="margin-top:10px; color: var(--muted);">Tot morgen, zaterdag 4 april om 15:00 CET! 🎯</p>
         </div>
       </div>
     </div>
@@ -344,20 +344,15 @@
 
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const data = new FormData(form);
-      try {
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: data,
-          headers: { 'Accept': 'application/json' }
-        });
-        // Show thank-you regardless of Formspree status (placeholder endpoint)
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const subject = encodeURIComponent('Webinar aanmelding: White-Label AI — ' + name);
+      const body = encodeURIComponent('Naam: ' + name + '\nEmail: ' + email + '\n\nAanmeldingstijd: ' + new Date().toISOString());
+      window.location.href = 'mailto:info@theprofitfactory.ai?subject=' + subject + '&body=' + body;
+      setTimeout(function() {
         formContainer.style.display = 'none';
         thankyou.style.display = 'block';
-      } catch (err) {
-        formContainer.style.display = 'none';
-        thankyou.style.display = 'block';
-      }
+      }, 500);
     });
   </script>
 </body>
