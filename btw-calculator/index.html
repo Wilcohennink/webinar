@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gratis BTW Calculator — The Profit Factory</title>
+  <meta name="description" content="Bereken BTW snel en gratis. 6%, 9%, 21%. Excl naar incl of incl naar excl." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+    .logo {
+      font-size: .85rem;
+      color: #f4c430;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    h1 span { color: #f4c430; }
+    .sub { color: #94a3b8; font-size: .9rem; margin-bottom: 28px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: .82rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #f8fafc;
+      font-size: 1.1rem;
+      font-weight: 600;
+      outline: none;
+    }
+    input[type="number"]:focus { border-color: #f4c430; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .tab.active { background: #f4c430; color: #0f172a; border-color: #f4c430; }
+    .btw-buttons { display: flex; gap: 8px; margin-bottom: 24px; }
+    .btw-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btw-btn.active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+    .results {
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 20px;
+      display: none;
+    }
+    .results.show { display: block; }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: .95rem;
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .label { color: #94a3b8; }
+    .result-row .val { font-weight: 700; color: #f8fafc; }
+    .result-row.main .val { color: #f4c430; font-size: 1.3rem; }
+    .cta {
+      margin-top: 28px;
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid #334155;
+    }
+    .cta p { color: #94a3b8; font-size: .85rem; margin-bottom: 12px; }
+    .cta a {
+      display: inline-block;
+      background: #f4c430;
+      color: #0f172a;
+      font-weight: 800;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: .9rem;
+    }
+    @media (max-width: 480px) {
+      .card { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">The Profit Factory</div>
+  <div class="card">
+    <h1>Gratis <span>BTW</span> Calculator</h1>
+    <p class="sub">Bereken BTW razendsnel. 6%, 9%, 21%. Excl ↔ Incl.</p>
+
+    <div class="field">
+      <label>BTW Tarief</label>
+      <div class="btw-buttons">
+        <button class="btw-btn" onclick="setRate(6, this)">6%</button>
+        <button class="btw-btn" onclick="setRate(9, this)">9%</button>
+        <button class="btw-btn active" onclick="setRate(21, this)">21%</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Richting</label>
+      <div class="tabs">
+        <button class="tab active" onclick="setDir('excl', this)">Excl → Incl BTW</button>
+        <button class="tab" onclick="setDir('incl', this)">Incl → Excl BTW</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label id="input-label">Bedrag excl. BTW (€)</label>
+      <input type="number" id="amount" placeholder="0,00" oninput="calculate()" step="0.01" min="0" />
+    </div>
+
+    <div class="results" id="results">
+      <div class="result-row">
+        <span class="label">Nettobedrag (excl. BTW)</span>
+        <span class="val" id="r-excl">—</span>
+      </div>
+      <div class="result-row">
+        <span class="label">BTW bedrag</span>
+        <span class="val" id="r-btw">—</span>
+      </div>
+      <div class="result-row main">
+        <span class="label">Totaal (incl. BTW)</span>
+        <span class="val" id="r-incl">—</span>
+      </div>
+    </div>
+
+    <div class="cta">
+      <p>Factuur nodig? Maak gratis een professionele PDF-factuur in 60 seconden.</p>
+      <a href="https://theprofitfactory.ai/invoice-generator">Gratis Factuurmaker →</a>
+    </div>
+  </div>
+
+  <script>
+    let rate = 21;
+    let dir = 'excl';
+
+    function setRate(r, el) {
+      rate = r;
+      document.querySelectorAll('.btw-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      calculate();
+    }
+
+    function setDir(d, el) {
+      dir = d;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('input-label').textContent =
+        d === 'excl' ? 'Bedrag excl. BTW (€)' : 'Bedrag incl. BTW (€)';
+      calculate();
+    }
+
+    function fmt(n) {
+      return '€ ' + n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function calculate() {
+      const val = parseFloat(document.getElementById('amount').value);
+      const results = document.getElementById('results');
+      if (!val || val <= 0) { results.classList.remove('show'); return; }
+
+      let excl, incl, btw;
+      if (dir === 'excl') {
+        excl = val;
+        btw = excl * rate / 100;
+        incl = excl + btw;
+      } else {
+        incl = val;
+        excl = incl / (1 + rate / 100);
+        btw = incl - excl;
+      }
+
+      document.getElementById('r-excl').textContent = fmt(excl);
+      document.getElementById('r-btw').textContent = fmt(btw);
+      document.getElementById('r-incl').textContent = fmt(incl);
+      results.classList.add('show');
+    }
+  </script>
+</body>
+</html>
