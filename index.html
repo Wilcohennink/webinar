@@ -309,7 +309,7 @@
         <div id="form-container">
           <h2>Reserveer je gratis plek</h2>
           <p class="sub">Beperkt aantal plaatsen beschikbaar — meld je nu aan.</p>
-          <form id="webinar-form" action="mailto:info@theprofitfactory.ai" method="POST" enctype="text/plain">
+          <form id="webinar-form" action="https://formsubmit.co/info@theprofitfactory.ai" method="POST">
             <input type="hidden" name="_subject" value="Webinar aanmelding: Hoe Bureaus €10K+ Verdienen met White-Label AI" />
             <div class="form-group">
               <label for="name">Naam</label>
@@ -346,13 +346,41 @@
       e.preventDefault();
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
-      const subject = encodeURIComponent('Webinar aanmelding: White-Label AI — ' + name);
-      const body = encodeURIComponent('Naam: ' + name + '\nEmail: ' + email + '\n\nAanmeldingstijd: ' + new Date().toISOString());
-      window.location.href = 'mailto:info@theprofitfactory.ai?subject=' + subject + '&body=' + body;
-      setTimeout(function() {
+      
+      // Submit via FormSubmit.co
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('_subject', 'Webinar aanmelding: White-Label AI — ' + name);
+      formData.append('_captcha', 'false');
+      formData.append('_template', 'table');
+      
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/info@theprofitfactory.ai', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: formData
+        });
+        const result = await response.json();
+        if (result.success) {
+          formContainer.style.display = 'none';
+          thankyou.style.display = 'block';
+        } else {
+          // Fallback to mailto
+          const subject = encodeURIComponent('Webinar aanmelding: White-Label AI — ' + name);
+          const body = encodeURIComponent('Naam: ' + name + '\nEmail: ' + email);
+          window.open('mailto:info@theprofitfactory.ai?subject=' + subject + '&body=' + body);
+          formContainer.style.display = 'none';
+          thankyou.style.display = 'block';
+        }
+      } catch(err) {
+        // Fallback to mailto
+        const subject = encodeURIComponent('Webinar aanmelding: White-Label AI — ' + name);
+        const body = encodeURIComponent('Naam: ' + name + '\nEmail: ' + email);
+        window.open('mailto:info@theprofitfactory.ai?subject=' + subject + '&body=' + body);
         formContainer.style.display = 'none';
         thankyou.style.display = 'block';
-      }, 500);
+      }
     });
   </script>
 </body>
